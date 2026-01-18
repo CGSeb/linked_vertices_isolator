@@ -7,7 +7,7 @@ from bpy.props import (
 
 class MESH_OT_create_linked_vertices_groups(Operator):
     bl_idname = "mesh.create_linked_vertices_groups"
-    bl_label = "Create Linked Vertex Groups"
+    bl_label = "Create Linked Groups"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -54,7 +54,7 @@ class MESH_OT_create_linked_vertices_groups(Operator):
 
 class MESH_OT_isolate_vertex_group(Operator):
     bl_idname = "mesh.isolate_vertex_group"
-    bl_label = "Isolate Vertex Group"
+    bl_label = "Isolate Group"
 
     index: IntProperty()
 
@@ -68,7 +68,14 @@ class MESH_OT_isolate_vertex_group(Operator):
         groups = scene.linked_vertices_groups
 
         bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.mesh.select_mode(type="VERT")
+
+        ts = context.tool_settings
+
+        # --- STORE PREVIOUS SELECT MODE ---
+        prev_select_mode = ts.mesh_select_mode[:]
+
+        # Force vertex select
+        ts.mesh_select_mode = (True, False, False)
 
         bm = bmesh.from_edit_mesh(obj.data)
 
@@ -77,7 +84,7 @@ class MESH_OT_isolate_vertex_group(Operator):
         bpy.ops.mesh.select_all(action='DESELECT')
 
         if self.shift:
-            # MULTI-ISOLATE: toggle this group only
+            # MULTI-ISOLATE
             groups[self.index].visible = not groups[self.index].visible
         else:
             # EXCLUSIVE ISOLATE
@@ -99,12 +106,18 @@ class MESH_OT_isolate_vertex_group(Operator):
         # Hide everything else
         bpy.ops.mesh.hide(unselected=True)
 
+        # --- RESTORE PREVIOUS SELECT MODE ---
+        ts.mesh_select_mode = prev_select_mode
+        bpy.ops.view3d.view_selected()
+
+        bpy.ops.mesh.select_all(action='DESELECT')
+
         return {'FINISHED'}
 
 
 class MESH_OT_show_all_vertex_groups(Operator):
     bl_idname = "mesh.show_all_vertex_groups"
-    bl_label = "Show All Vertex Groups"
+    bl_label = "Show All Groups"
 
     def execute(self, context):
         bpy.ops.object.mode_set(mode='EDIT')

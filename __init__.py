@@ -13,7 +13,7 @@ from .data import LinkedVertexGroup
 # --------------------------------------------------
 
 class VIEW3D_PT_linked_vertices_groups(Panel):
-    bl_label = "Vertex Groups by Links"
+    bl_label = "Vertex Grouped by Links"
     bl_idname = "VIEW3D_PT_linked_vertices_groups"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -23,8 +23,8 @@ class VIEW3D_PT_linked_vertices_groups(Panel):
         layout = self.layout
         scene = context.scene
 
-        layout.operator("mesh.create_linked_vertices_groups", icon='GROUP_VERTEX')
-        layout.operator("mesh.show_all_vertex_groups", icon='HIDE_OFF')
+        layout.operator(MESH_OT_create_linked_vertices_groups.bl_idname, icon='GROUP_VERTEX')
+        layout.operator(MESH_OT_show_all_vertex_groups.bl_idname, icon='HIDE_OFF')
 
         layout.separator()
         layout.label(text="(Shift click to isolate multiple)")
@@ -33,7 +33,7 @@ class VIEW3D_PT_linked_vertices_groups(Panel):
             row = layout.row(align=True)
             icon = 'HIDE_OFF' if group.visible else 'HIDE_ON'
             row.operator(
-                "mesh.isolate_vertex_group",
+                MESH_OT_isolate_vertex_group.bl_idname,
                 text=group.name,
                 icon=icon,
             ).index = i
